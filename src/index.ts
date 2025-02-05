@@ -5,6 +5,7 @@ import router from "./router/router";
 import { Roles } from "./types/roles";
 import prisma from "./config/db";
 import { hashPassword } from "./utils/password";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
 
 dotenv.config();
 
@@ -23,6 +24,10 @@ app.get("/", (_req: Request, res: Response) => {
 });
 
 app.use("/api/v1", router);
+
+app.all("*", (_req: Request, res: Response) => {
+  res.status(404).json({ message: "Ruta no encontrada" });
+});
 
 // crear un usuario por defecto
 const createDefaultUser = async () => {
@@ -45,7 +50,7 @@ const createDefaultUser = async () => {
           name: process.env.DEFAULT_USER_NAME,
           email: process.env.DEFAULT_USER_EMAIL,
           password: await hashPassword(process.env.DEFAULT_USER_PASSWORD),
-          role: Roles.Admin
+          role: Roles.Admin,
         },
       });
       console.log("Usuario por defecto creado");
@@ -71,5 +76,7 @@ const startServer = async () => {
     process.exit(1);
   }
 };
+
+app.use(errorHandler);
 
 startServer();

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { UserPayload } from "../types/user";
 import { hashPassword, comparePassword } from "../utils/password";
 import { Roles } from "../types/roles";
@@ -103,13 +103,13 @@ export const token = async (req: Request, res: Response) => {
     const payload = jwt.verify(
       refreshToken,
       process.env.JWT_SECRET_REFRESH as string
-    ) as JwtPayload;
+    ) as UserPayload;
 
-    const { id, email, roles } = payload;
+    const { id, role } = payload;
 
     // generar nuevo token de acceso
     const accessToken = jwt.sign(
-      { id, email, roles },
+      { id, role },
       process.env.JWT_SECRET as string,
       {
         expiresIn: "1h",
